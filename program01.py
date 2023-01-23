@@ -126,46 +126,205 @@ NOTA: il sistema di test riconosce la presenza di ricorsione SOLO se
     funzione/metodo altrimenti fallirete tutti i test.
 """
 
-from typing import Sequence
-from rtrace import trace
+# from typing import Sequence
+# from rtrace import trace
 import images
 
-# TODO
-# da anidare in forma ricorsiva il controllo di ogni cuadrante
 
+###
 
 def ex1(input_file,  output_file):
-
-   
-
     # prende input immagine
     img_in = images.load(input_file)
 
-    # bg
-    bg = img_in[0][0]
-
     # pulisci
-    images.save(img_in, output_file)
-
-    #img_in[1010][856]=(0,0,0)
     #images.save(img_in, output_file)
 
-    colori = []
-    colori = trova_divisione_4toCuadrante(img_in, bg, 0, 0, colori)
-    # colori = trova_divisione_1erCuadrante(img_in, bg, 128, 128, colori)
-    # colori = trova_divisione_2doCuadrante(img_in, bg, 218,402, colori)
-    # colori = trova_divisione_3erCuadrante(img_in, bg, 218,100, colori)
+    # bg
+    bg = img_in[0][0]
+    lista_immaggine=[]
+    lista_immaggine.append(img_in)
+    colori=[]
+    num_lotti=0
+    colori,num_lotti=divide_et_impera(lista_immaggine,bg,colori,num_lotti)
+    
+    #Output dei colori
+    img_out = [[]]
+    img_out[0].append(bg)
 
-    img_out = []
-    img_out.append(bg)
-    for colore in colori:
-        img_out.append(colore)
-
+    if colori :
+        num_lotti=num_lotti
+        for colore in colori:
+            img_out[0].append(colore)
+    else:
+        num_lotti=1
 
     images.save(img_out,output_file )
 
+    return num_lotti
 
-def trova_divisione_4toCuadrante(img_in, bg, y, x, colori):
+
+#da farte una struttura ad albero quatiternario
+
+#fare una funzione divide_et_impera
+#che riceve in input una immaggine
+#verifica se questa è una sottodivisione
+#se è si, divide i quattro cuadranti della immmaggine, 
+#  e richiama la stessa funzione in maniera ricorsiva passando come 
+#parametro la lista delle immaggine (l'ordine di divisione sarebbe,
+#  4to cuadrante, 1mo cuadrante, 2do cuadrante e 3er cuadrante)
+# se è no, allora fare return del colore dell'immmagine.
+
+def divide_1erCuadrante(immaggine,x,y,bg):
+    centro_y=y
+    centro_x=x
+    #fare ciclo fino a zero (top y) O fino a trovare un'altra sottodivisione
+    for y in range(y-1, 0, -1):
+        
+        if trova_fine_colonna_y_cuadrante_v2(immaggine[y][x-1:x+2],bg) == True:
+            return  taglia_primo_cuadrante(immaggine,centro_x,centro_y)
+    else:
+        #vuol dire che è arrivato alla fine dell'immaggine 
+        #senza trovare la divisione
+        #taglia per il bordo con il colore
+        # return taglia_primo_cuadrante(immaggine,centro_y-3,centro_x+2)
+        return taglia_primo_cuadrante(immaggine,centro_x+2,centro_y-3)
+    
+def divide_2doCuadrante(immaggine,x,y,bg):
+    centro_y=y
+    centro_x=x
+    #fare ciclo fino a zero (top y) O fino a trovare un'altra sottodivisione
+    for y in range(y-1, 0, -1):
+        if trova_fine_colonna_y_cuadrante_v2(immaggine[y][x-1:x+2],bg) == True:
+            return  taglia_secondo_cuadrante(immaggine,centro_x,centro_y)
+    else:
+        #vuol dire che è arrivato alla fine dell'immaggine 
+        #senza trovare la divisione
+        #taglia per il bordo con il colore
+        return taglia_secondo_cuadrante(immaggine,centro_x,centro_y)
+    
+def divide_3erCuadrante(immaggine,x,y,bg):
+    centro_y=y
+    centro_x=x
+    #fare ciclo fino a max_y fino a trovare un'altra sottodivisione
+    for y in range(y+1, len(immaggine), +1):
+        if trova_fine_colonna_y_cuadrante_v2(immaggine[y][x-1:x+2],bg) == True:
+            return  taglia_terzo_cuadrante(immaggine,centro_x,centro_y)
+    else:
+        #vuol dire che è arrivato alla fine dell'immaggine 
+        #senza trovare la divisione
+        #taglia per il bordo con il colore
+        return taglia_terzo_cuadrante(immaggine,centro_x,centro_y+1)
+    
+def divide_4toCuadrante(immaggine,x,y,bg):
+    centro_y=y
+    centro_x=x
+    #fare ciclo fino a max_y fino a trovare un'altra sottodivisione
+    for y in range(y+1, len(immaggine), +1):
+        if trova_fine_colonna_y_cuadrante_v2(immaggine[y][x-1:x+2],bg) == True:
+            return  taglia_quarto_cuadrante(immaggine,centro_x,centro_y)
+    else:
+        #vuol dire che è arrivato alla fine dell'immaggine 
+        #senza trovare la divisione
+        #taglia per il bordo con il colore
+        return taglia_quarto_cuadrante(immaggine,centro_x+1,centro_y+1)
+
+def taglia_quarto_cuadrante(immaggine, da_x, da_y):
+    immaggine= immaggine[da_y:]
+    immaggine_tagliata=[]
+    for y in range(len(immaggine)):
+        immaggine_tagliata.append(immaggine[y][da_x:])
+    return immaggine_tagliata
+
+def taglia_terzo_cuadrante(immaggine, da_x, da_y):
+    immaggine= immaggine[da_y:]
+    immaggine_tagliata=[]
+    for y in range(len(immaggine)):
+        immaggine_tagliata.append(immaggine[y][:da_x])
+    return immaggine_tagliata
+
+def taglia_primo_cuadrante(immaggine, da_x, da_y):
+    immaggine= immaggine[:da_y]
+    immaggine_tagliata=[]
+    for y in range(len(immaggine)):
+        immaggine_tagliata.append(immaggine[y][da_x:])
+
+    return immaggine_tagliata
+
+def taglia_secondo_cuadrante(immaggine, da_x, da_y):
+    immaggine= immaggine[:da_y]
+    immaggine_tagliata=[]
+    for y in range(len(immaggine)):
+        immaggine_tagliata.append(immaggine[y][:da_x])
+
+    return immaggine_tagliata
+
+def divide_et_impera(lista_immaggini,bg,colori:list,num_lotti):
+
+    for immaggine in lista_immaggini:
+        if contiene_sottodivisioni(immaggine,bg)   ==True:
+            
+            #si deve trovare l'origine dell'immaggine
+            #da divedere i 4 cuadranti dell'immaggine
+            #aggiungere dentro una lista di immaggine
+            #passarlo a divide_et_impera
+            colore, origine_Y=colore_Y_sottodivisioni(immaggine,bg)
+            origine_x =trova_origine_x(immaggine,colore,0,origine_Y)
+
+            #salvo il colore del origine del nodo
+            colori.append(colore)
+
+            new_list_immmaggine=[]
+
+            #4to cuadrante
+            immaggine_divisa_4tocuadrante=divide_4toCuadrante(immaggine,origine_x,origine_Y,bg)
+            #images.save(immaggine_divisa_4tocuadrante, 'small01TEST.out.png')
+            new_list_immmaggine.append(immaggine_divisa_4tocuadrante)
+
+            #3er cuadrante
+            immaggine_divisa_3ercuadrante=divide_3erCuadrante(immaggine,origine_x,origine_Y,bg)
+            #images.save(immaggine_divisa_3ercuadrante, 'small01TEST.out.png')
+            new_list_immmaggine.append(immaggine_divisa_3ercuadrante)
+
+            #1er cuadrante
+            immaggine_divisa_1ercuadrante=divide_1erCuadrante(immaggine,origine_x,origine_Y,bg)
+            #images.save(immaggine_divisa_1ercuadrante, 'small01TEST.out.png')
+            new_list_immmaggine.append(immaggine_divisa_1ercuadrante)
+
+            #2do cuadrante
+            immaggine_divisa_2docuadrante=divide_2doCuadrante(immaggine,origine_x,origine_Y,bg)
+            #images.save(immaggine_divisa_2docuadrante, 'small01TEST.out.png')
+            new_list_immmaggine.append(immaggine_divisa_2docuadrante)
+
+            null,num_lotti= divide_et_impera(new_list_immmaggine,bg,colori,num_lotti) 
+        else:
+            # se non contiene sottodivissione, vuol dire che
+            #si è arrivato alla fine se si deve ritornare il colore corrente
+            #colore_corrente=immaggine[0][0]
+            num_lotti+=1
+            continue 
+           
+    return colori,num_lotti
+            #return  None , num_lotti+1#colori.append(colore_corrente)
+
+    return colori,num_lotti
+
+def contiene_sottodivisioni(immaggine, bg):
+    for y in range(1, len(immaggine)):
+        lista_tagliata = immaggine[y][1:]
+        if trova_divisione(lista_tagliata, bg) == True:
+            return True
+    return False
+
+def colore_Y_sottodivisioni(immaggine, bg):
+    for y in range(1, len(immaggine)):
+        lista_tagliata = immaggine[y][1:]
+        if trova_divisione(lista_tagliata, bg) == True:
+            return lista_tagliata[0] , y
+    #TODO sistemare ritorno     
+    #return False
+
+def trova_divisione_4toCuadrante(img_in, bg, y, x, colori,lista_centri):
     #last_center
     last_center_y=y
     last_center_x=x
@@ -177,9 +336,19 @@ def trova_divisione_4toCuadrante(img_in, bg, y, x, colori):
             colori.append(lista_tagliata[0])
             # img_in[coord_y][coord_x] = (255, 255, 255)
             # images.save(img_in, 'hard01TEST.out.png')
-            return trova_divisione_4toCuadrante(img_in, bg, coord_y, coord_x, colori)
-    return trova_divisione_1erCuadrante(img_in, bg,last_center_y,last_center_x, colori)
+            lista_centri.append((coord_y,coord_x))
+            return trova_divisione_4toCuadrante(img_in, bg, coord_y, coord_x, colori,lista_centri)
+        
+    # lista_centri=lista_centri[1:]
+    # for centro in  reversed(lista_centri):
+    #   x=trova_divisione_1erCuadrante(img_in, bg,centro[0],centro[1], [])
+    #   colori.append(x)
+    #   x=trova_divisione_2doCuadrante(img_in, bg,centro[0],centro[1], [])
+    #   colori.append(x)
+    #   x=trova_divisione_3erCuadrante(img_in, bg,centro[0],centro[1], [])
+    #   colori.append(x)
 
+    return trova_divisione_1erCuadrante(img_in, bg,last_center_y,last_center_x, colori)
 
 def trova_divisione_1erCuadrante(img_in, bg, y, x, colori):
     #last_center
@@ -192,13 +361,12 @@ def trova_divisione_1erCuadrante(img_in, bg, y, x, colori):
         if trova_divisione(lista_tagliata, bg) == True:
             coord_x = trova_origine_x(img_in, lista_tagliata[0], x, y)
             coord_y = y
-            colori.append(lista_tagliata[0])
+            #colori.append(lista_tagliata[0])
             # img_in[coord_y][coord_x] = (255, 255, 255)
             # images.save(img_in, 'hard01TEST.out.png')
             return trova_divisione_1erCuadrante(img_in, bg, coord_y, coord_x, colori)
         
     return trova_divisione_2doCuadrante(img_in, bg, last_center_y,last_center_x, colori)
-
 
 def trova_divisione_2doCuadrante(img_in, bg, y, x, colori):
     #last_center
@@ -211,13 +379,12 @@ def trova_divisione_2doCuadrante(img_in, bg, y, x, colori):
         if trova_divisione(lista_tagliata, bg) == True:
             coord_x = trova_origine_x_inverso(img_in, lista_tagliata[0], x, y)
             coord_y = y
-            colori.append(lista_tagliata[0])
+            #colori.append(lista_tagliata[0])
             # img_in[coord_y][coord_x] = (0, 0, 0)
             # images.save(img_in, 'rect02TEST.out.png')
             return trova_divisione_2doCuadrante(img_in, bg, coord_y, coord_x, colori)
-        
+    
     return trova_divisione_3erCuadrante(img_in, bg, last_center_y, last_center_x, colori)
-
 
 def trova_divisione_3erCuadrante(img_in, bg, y, x, colori):
     #last_center
@@ -230,13 +397,15 @@ def trova_divisione_3erCuadrante(img_in, bg, y, x, colori):
         if trova_divisione(lista_tagliata, bg) == True:
             coord_x = trova_origine_x_inverso(img_in, lista_tagliata[0], x, y)
             coord_y = y
-            colori.append(lista_tagliata[0])
+            #colori.append(lista_tagliata[0])
             # img_in[coord_y][coord_x] = (255, 255, 255)
             # images.save(img_in, 'medium02TEST.out.png')
             return trova_divisione_3erCuadrante(img_in, bg, coord_y, coord_x, colori)
         
-    return trova_divisione_4toCuadrante(img_in, bg,last_center_y,last_center_x, colori)
+    return colori
 
+    #ritorno ultimo colore trovato
+    #return img_in[last_center_y][last_center_x]
 
 # tutti i colori devono essere uguali e diversi del colore_bg della lista X o Y passata
 def trova_divisione(lista_colori, colore_bg):
@@ -250,13 +419,16 @@ def trova_divisione(lista_colori, colore_bg):
 # controlla se gli estremi sono uguali colore, vuol dire
 # che ha trovato la fine
 # della colonna di colori
-
-
 def trova_fine_colonna_y_cuadrante(lista_colori, colore_bg):
     if lista_colori[0] != colore_bg:
         if lista_colori[2] != colore_bg:
             return True
-
+        
+def trova_fine_colonna_y_cuadrante_v2(lista_colori, colore_bg):
+    if lista_colori[0] != colore_bg:
+        if lista_colori[1] != colore_bg:
+            if lista_colori[2] != colore_bg:
+             return True
 
 def trova_origine_y(img_in, colore, x, y):
     # max_len=len(img_in[y])
@@ -268,7 +440,8 @@ def trova_origine_y(img_in, colore, x, y):
 
     return y
 
-
+#controlla sopra e sotto nello stesso asse delle X
+#se trova che sono uguali, vuol dire che c'è la divisione su quel X
 def trova_origine_x(img_in, colore, x, y):
     # max_len=len(img_in[x])
     while (True):
@@ -276,9 +449,7 @@ def trova_origine_x(img_in, colore, x, y):
             if img_in[y-1][x] == colore:
                 break
         x = x+1
-
     return x
-
 
 def trova_origine_x_inverso(img_in, colore, x, y):
     # max_len=len(img_in[x])
@@ -287,9 +458,13 @@ def trova_origine_x_inverso(img_in, colore, x, y):
             if img_in[y-1][x] == colore:
                 break
         x = x-1
-
     return x
 
 
-if __name__ == '__main__':
-    ex1('puzzles/hard01.in.png', 'hard01TEST.out.png')
+#if __name__ == '__main__':
+      #ex1('puzzles/small01.in.png', 'small01TEST.out.png')
+   # ex1('puzzles/fullcase01.in.png', 'fullcase01TEST.out.png')
+
+
+
+
