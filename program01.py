@@ -164,6 +164,7 @@ def ex1(input_file,  output_file):
     return num_lotti
 
 
+
 #da farte una struttura ad albero quatiternario
 
 #fare una funzione divide_et_impera
