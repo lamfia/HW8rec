@@ -269,6 +269,7 @@ def divide_et_impera(lista_immaggini,bg,colori:list,num_lotti):
             #aggiungere dentro una lista di immaggine
             #passarlo a divide_et_impera
             colore, origine_Y=colore_Y_sottodivisioni(immaggine,bg)
+            #images.save(immaggine, 'fullcase01TEST.out.png')
             origine_x =trova_origine_x(immaggine,colore,0,origine_Y)
 
             #salvo il colore del origine del nodo
@@ -278,22 +279,22 @@ def divide_et_impera(lista_immaggini,bg,colori:list,num_lotti):
 
             #4to cuadrante
             immaggine_divisa_4tocuadrante=divide_4toCuadrante(immaggine,origine_x,origine_Y,bg)
-            #images.save(immaggine_divisa_4tocuadrante, 'small01TEST.out.png')
+            #images.save(immaggine_divisa_4tocuadrante, 'fullcase01TEST.out.png')
             new_list_immmaggine.append(immaggine_divisa_4tocuadrante)
 
             #3er cuadrante
             immaggine_divisa_3ercuadrante=divide_3erCuadrante(immaggine,origine_x,origine_Y,bg)
-            #images.save(immaggine_divisa_3ercuadrante, 'small01TEST.out.png')
+            #images.save(immaggine_divisa_3ercuadrante, 'fullcase01TEST.out.png')
             new_list_immmaggine.append(immaggine_divisa_3ercuadrante)
 
             #1er cuadrante
             immaggine_divisa_1ercuadrante=divide_1erCuadrante(immaggine,origine_x,origine_Y,bg)
-            #images.save(immaggine_divisa_1ercuadrante, 'small01TEST.out.png')
+            #images.save(immaggine_divisa_1ercuadrante, 'fullcase01TEST.out.png')
             new_list_immmaggine.append(immaggine_divisa_1ercuadrante)
 
             #2do cuadrante
             immaggine_divisa_2docuadrante=divide_2doCuadrante(immaggine,origine_x,origine_Y,bg)
-            #images.save(immaggine_divisa_2docuadrante, 'small01TEST.out.png')
+            #images.save(immaggine_divisa_2docuadrante, 'fullcase01TEST.out.png')
             new_list_immmaggine.append(immaggine_divisa_2docuadrante)
 
             null,num_lotti= divide_et_impera(new_list_immmaggine,bg,colori,num_lotti) 
@@ -307,7 +308,6 @@ def divide_et_impera(lista_immaggini,bg,colori:list,num_lotti):
     return colori,num_lotti
             #return  None , num_lotti+1#colori.append(colore_corrente)
 
-    return colori,num_lotti
 
 def contiene_sottodivisioni(immaggine, bg):
     for y in range(1, len(immaggine)):
@@ -443,11 +443,17 @@ def trova_origine_y(img_in, colore, x, y):
 #controlla sopra e sotto nello stesso asse delle X
 #se trova che sono uguali, vuol dire che c'è la divisione su quel X
 def trova_origine_x(img_in, colore, x, y):
-    # max_len=len(img_in[x])
+    max_len_y=len(img_in)
+    max_len_x=len(img_in[0])
     while (True):
-        if img_in[y+1][x] == colore:
-            if img_in[y-1][x] == colore:
-                break
+        if y+1>max_len_y:
+            if img_in[y+1][x] == colore :
+                if img_in[y-1][x] == colore:
+                     break
+        else:
+             if img_in[y-1][x] == colore:
+                     break
+
         x = x+1
     return x
 
@@ -462,8 +468,8 @@ def trova_origine_x_inverso(img_in, colore, x, y):
 
 
 #if __name__ == '__main__':
-      #ex1('puzzles/small01.in.png', 'small01TEST.out.png')
-   # ex1('puzzles/fullcase01.in.png', 'fullcase01TEST.out.png')
+    #ex1('puzzles/medium01.in.png', 'medium01TEST.out.png')
+    #ex1('puzzles/fullcase01.in.png', 'fullcase01TEST.out.png')
 
 
 
