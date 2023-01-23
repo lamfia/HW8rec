@@ -188,7 +188,7 @@ def divide_1erCuadrante(immaggine,x,y,bg):
         #senza trovare la divisione
         #taglia per il bordo con il colore
         # return taglia_primo_cuadrante(immaggine,centro_y-3,centro_x+2)
-        return taglia_primo_cuadrante(immaggine,centro_x+2,centro_y-3)
+        return taglia_primo_cuadrante(immaggine,centro_x,centro_y)
     
 def divide_2doCuadrante(immaggine,x,y,bg):
     centro_y=y
@@ -214,7 +214,7 @@ def divide_3erCuadrante(immaggine,x,y,bg):
         #vuol dire che è arrivato alla fine dell'immaggine 
         #senza trovare la divisione
         #taglia per il bordo con il colore
-        return taglia_terzo_cuadrante(immaggine,centro_x,centro_y+1)
+        return taglia_terzo_cuadrante(immaggine,centro_x,centro_y)
     
 def divide_4toCuadrante(immaggine,x,y,bg):
     centro_y=y
@@ -227,7 +227,7 @@ def divide_4toCuadrante(immaggine,x,y,bg):
         #vuol dire che è arrivato alla fine dell'immaggine 
         #senza trovare la divisione
         #taglia per il bordo con il colore
-        return taglia_quarto_cuadrante(immaggine,centro_x+1,centro_y+1)
+        return taglia_quarto_cuadrante(immaggine,centro_x,centro_y)
 
 def taglia_quarto_cuadrante(immaggine, da_x, da_y):
     immaggine= immaggine[da_y:]
@@ -307,7 +307,6 @@ def divide_et_impera(lista_immaggini,bg,colori:list,num_lotti):
            
     return colori,num_lotti
             #return  None , num_lotti+1#colori.append(colore_corrente)
-
 
 def contiene_sottodivisioni(immaggine, bg):
     for y in range(1, len(immaggine)):
